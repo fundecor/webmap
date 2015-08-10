@@ -1,0 +1,67 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]><html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Fundecor | OGR2Layers</title>
+	<link rel="stylesheet" media="screen" type="text/css" href="css/style.css" />
+</head>
+<body>
+	<div id="container">
+		<header role="banner">
+		</header>
+		<main role="main">
+			<h2>OpenLayers</h2>
+			<div id="open-layers-map"></div>
+		</div>
+		<footer role="contentinfo"></footer>
+	</div>
+	<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<script>
+		window.jQuery || document.write('<script src="js/libs/jquery-1.8.3.min.js"><\/script>')
+	</script>
+	<script src="http://www.openlayers.org/api/2.13/OpenLayers.js"></script>
+	<script type="text/javascript">
+	var map, selectsControls
+	function init(){
+		var option = {
+			projection: new OpenLayers.Projection("EPSG:900913"),
+			displayProjection: new OpenLayers.Projection("EPSG:4326")
+		};
+		map = new OpenLayers.Map('open-layers-map', option);
+		var attribution = {attribution:"&copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"};
+		olmapnik = new OpenLayers.Layer.OSM("OpenStreetMap Mapnik", "http://tile.openstreetmap.org/${z}/${x}/${y}.png", attribution);
+		map.addLayer(olmapnik);
+		map.setBaseLayer(olmapnik);
+		var ls= new OpenLayers.Control.LayerSwitcher(); 
+		map.addControl(ls); 
+		ls.maximizeControl(); 
+		map.addControl(new OpenLayers.Control.MousePosition());
+		map.addControl(new OpenLayers.Control.Navigation());
+		var Catastro_Forestal = new OpenLayers.Layer.WMS("Catastro Forestal WMS",
+			"http://servicios.fundecor.org:80/geoserver/BD_FUNDECOR/wms?", 
+			{
+				layers: "catfund_4_15",
+				transparent: true ,
+				format: "image/png"
+						}, {
+				isBaseLayer: false
+			});
+		map.addLayer(Catastro_Forestal);
+		
+		var aliasproj = new OpenLayers.Projection("EPSG:3857");
+		Catastro_Forestal.projection = aliasproj;
+		extent = new OpenLayers.Bounds(-85.164187,9.541568,-82.755744,11.002347).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
+		map.zoomToExtent(extent);
+	};
+
+	$(function() {
+		init();
+	});
+	</script>
+</body>
+</html>
